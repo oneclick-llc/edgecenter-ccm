@@ -47,7 +47,11 @@ func (l *LbaasV2) EnsureFloatingIP(ctx context.Context, client *edgecloud.Client
 
 	if len(fips) == 1 {
 		klog.Infof("Floating IP already exists for port %s: %s", portID, fips[0].FloatingIPAddress)
-		return net.ParseIP(fips[0].FloatingIPAddress), nil
+		assignedIP := net.ParseIP(fips[0].FloatingIPAddress)
+		if existingFIP != nil && (assignedIP == nil || !assignedIP.Equal(existingFIP)) {
+			return nil, fmt.Errorf("floating IP %s is already assigned to port %s, requested %s", fips[0].FloatingIPAddress, portID, existingFIP.String())
+		}
+		return assignedIP, nil
 	}
 
 	if existingFIP != nil {
@@ -99,6 +103,27 @@ func (l *LbaasV2) EnsureFloatingIP(ctx context.Context, client *edgecloud.Client
 	}
 
 	return net.ParseIP(fip.FloatingIPAddress), nil
+}
+
+func (l *LbaasV2) ensureStaticFloatingIPAvailable(ctx context.Context, address net.IP, expectedPortID string) error {
+	floatingIPs, _, err := l.client.Floatingips.List(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to list floating IPs: %w", err)
+	}
+	return validateStaticFloatingIPAssociation(floatingIPs, address, expectedPortID, l.edgecenter.RegionID)
+}
+
+func validateStaticFloatingIPAssociation(floatingIPs []edgecloud.FloatingIP, address net.IP, expectedPortID string, regionID int) error {
+	for _, floatingIP := range floatingIPs {
+		if floatingIP.FloatingIPAddress != address.String() {
+			continue
+		}
+		if floatingIP.PortID != "" && floatingIP.PortID != expectedPortID {
+			return fmt.Errorf("floating IP %s is already assigned to port %s in region %d", address, floatingIP.PortID, regionID)
+		}
+		return nil
+	}
+	return fmt.Errorf("floating IP %s was not found in Edgecenter region %d", address, regionID)
 }
 
 // getFloatingIPsByAddr returns all floating IPs matching the provided address.

@@ -15,9 +15,10 @@ Currently `edgecenter-cloud-controller-manager` implements:
 
 ## Compatibility with Kubernetes
 
-| Kubernetes Version | Edgecenter Cloud Controller Manager Version |
-|--------------------|---------------------------------------------|
-| v1.31              | v1.0.0                                      |
+| Kubernetes Version | Edgecenter Cloud Controller Manager Version | Validation |
+|--------------------|---------------------------------------------|------------|
+| v1.31              | v1.0.0                                      | Upstream compatibility entry |
+| v1.36              | v2.2.0                                      | Build and unit tests use Kubernetes v0.36.5 modules |
 
 ## LoadBalancer Service Annotations
 
@@ -25,6 +26,8 @@ The following annotations can be used to customize LoadBalancer behavior.
 
 | Annotation | Description | Create | Update | Notes |
 |------------|------------|--------|--------|------|
+| `loadbalancer.edgecenter.com/region-id` | Edgecenter region for this Service | ✅ | ❌ | Set with `floating-ip`; delete and recreate the Service to change it |
+| `loadbalancer.edgecenter.com/floating-ip` | Existing public IPv4 address | ✅ | ❌ | The controller keeps this address after Service deletion |
 | `loadbalancer.edgecenter.com/class` | Logical LB class (predefined network/subnet/floating config) | ✅ | ⚠️ Partial | Changes may not fully apply to existing LB |
 | `loadbalancer.edgecenter.com/network-id` | Network ID for LB VIP | ✅ | ❌ | Used only during LB creation |
 | `loadbalancer.edgecenter.com/subnet-id` | Subnet ID for LB VIP and pool members | ✅ | ⚠️ Partial | Does not move existing VIP |
@@ -92,6 +95,8 @@ users:
       client-certificate-data: <client-certificate-data>
       client-key-data: <client-key-data>
 ```
+
+The public container image is `ghcr.io/oneclick-llc/edgecenter-ccm:v2.2.0`.
 
 ### Example cloud-config.yaml
 
