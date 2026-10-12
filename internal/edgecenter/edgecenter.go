@@ -573,7 +573,7 @@ func (ec *Edgecenter) LoadBalancer() (cloudprovider.LoadBalancer, bool) {
 	klog.V(1).Info("Claiming to support LoadBalancer")
 
 	return &LbaasV2{
-		LoadBalancer{
+		LoadBalancer: LoadBalancer{
 			client:     ec.client,
 			opts:       ec.lbOpts,
 			edgecenter: ec.cfg.Edgecenter,

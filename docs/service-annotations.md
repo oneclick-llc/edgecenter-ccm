@@ -8,11 +8,13 @@
 
 - `loadbalancer.edgecenter.com/region-id`
 
-  The Edgecenter region ID for this Service. Set this annotation with `loadbalancer.edgecenter.com/floating-ip` to select a regional static IP.
+  The Edgecenter region ID for this Service. Set this annotation with `loadbalancer.edgecenter.com/ip-address` to select a regional static IP.
 
-- `loadbalancer.edgecenter.com/floating-ip`
+- `loadbalancer.edgecenter.com/ip-address`
 
-  An existing public IPv4 address in the selected region. The controller attaches this address to the load balancer. It keeps the address after you delete the Service.
+  An existing public IPv4 address in the selected region. The controller uses a matching reserved fixed IP port. It also accepts an existing floating IP.
+
+  The controller keeps this address after you delete the Service.
 
   Set both regional annotations on each Service. Create one `LoadBalancer` Service for each regional address. Do not change either annotation after you create a Service. Delete the Service before you change its region or address.
 
@@ -23,7 +25,7 @@
     name: nginx-region-20
     annotations:
       loadbalancer.edgecenter.com/region-id: "20"
-      loadbalancer.edgecenter.com/floating-ip: "203.0.113.20"
+      loadbalancer.edgecenter.com/ip-address: "203.0.113.20"
   spec:
     type: LoadBalancer
     selector:

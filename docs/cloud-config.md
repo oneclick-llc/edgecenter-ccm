@@ -116,6 +116,7 @@ Although the edgecenter-cloud-controller-manager was initially implemented with 
   network-id="network-id-for-region-20"
   subnet-id="subnet-id-for-region-20"
   floating-network-id="floating-network-id-for-region-20"
+  node-selector="topology.kubernetes.io/region=moscow"
   ```
 
 * `enable-ingress-hostname`

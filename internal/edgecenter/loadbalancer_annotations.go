@@ -55,7 +55,7 @@ const (
 	ServiceAnnotationLoadBalancerDefaultTLSContainerRef = "loadbalancer.edgecenter.com/default-tls-container-ref"        // nolint
 	ServiceAnnotationLoadBalancerFlavorID               = "loadbalancer.edgecenter.com/flavor-id"                        // nolint
 	ServiceAnnotationLoadBalancerRegionID               = "loadbalancer.edgecenter.com/region-id"                        // nolint
-	ServiceAnnotationLoadBalancerFloatingIP             = "loadbalancer.edgecenter.com/floating-ip"                      // nolint
+	ServiceAnnotationLoadBalancerIPAddress              = "loadbalancer.edgecenter.com/ip-address"                       // nolint
 
 	// k8sIngressTag is a legacy/internal tag value used for Kubernetes ingress-related resources.
 	k8sIngressTag = "k8s_ingress"
