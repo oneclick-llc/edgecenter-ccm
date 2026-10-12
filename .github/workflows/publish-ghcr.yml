@@ -44,7 +44,3 @@ jobs:
             org.opencontainers.image.source=https://github.com/oneclick-llc/edgecenter-ccm
             org.opencontainers.image.version=${{ github.ref_name }}
 
-      - name: Set package visibility to public
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh api --method PATCH /orgs/oneclick-llc/packages/container/edgecenter-ccm/visibility -f visibility=public
