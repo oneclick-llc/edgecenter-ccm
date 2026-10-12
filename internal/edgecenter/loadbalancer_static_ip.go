@@ -9,7 +9,8 @@ import (
 )
 
 type staticIPSelection struct {
-	ReservedVIPPortID string
+	ReservedVIPPortID   string
+	ReservedVIPSubnetID string
 }
 
 func (l *LbaasV2) resolveStaticIP(ctx context.Context, address net.IP, currentLB *edgecloud.Loadbalancer) (*staticIPSelection, error) {
@@ -77,7 +78,7 @@ func selectReservedVIPPort(reservedIPs []edgecloud.ReservedFixedIP, address net.
 		}
 	}
 
-	return &staticIPSelection{ReservedVIPPortID: match.PortID}, true, nil
+	return &staticIPSelection{ReservedVIPPortID: match.PortID, ReservedVIPSubnetID: match.SubnetID}, true, nil
 }
 
 func selectFloatingIP(floatingIPs []edgecloud.FloatingIP, address net.IP, currentLB *edgecloud.Loadbalancer) (*staticIPSelection, bool, error) {

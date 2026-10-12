@@ -202,6 +202,7 @@ func TestSelectReservedVIPPort(t *testing.T) {
 		reservedIPs []edgecloud.ReservedFixedIP
 		currentLB   *edgecloud.Loadbalancer
 		wantPortID  string
+		wantSubnet  string
 		wantFound   bool
 		wantError   bool
 	}{
@@ -211,8 +212,10 @@ func TestSelectReservedVIPPort(t *testing.T) {
 				FixedIPAddress: address,
 				IsExternal:     true,
 				PortID:         "vip-port",
+				SubnetID:       "public-subnet",
 			}},
 			wantPortID: "vip-port",
+			wantSubnet: "public-subnet",
 			wantFound:  true,
 		},
 		{
@@ -231,10 +234,12 @@ func TestSelectReservedVIPPort(t *testing.T) {
 				FixedIPAddress: address,
 				IsExternal:     true,
 				PortID:         "vip-port",
+				SubnetID:       "public-subnet",
 				Reservation:    edgecloud.Reservation{ResourceID: "current-lb"},
 			}},
 			currentLB:  &edgecloud.Loadbalancer{ID: "current-lb", VipAddress: address, VipPortID: "vip-port"},
 			wantPortID: "vip-port",
+			wantSubnet: "public-subnet",
 			wantFound:  true,
 		},
 		{
@@ -254,6 +259,9 @@ func TestSelectReservedVIPPort(t *testing.T) {
 			}
 			if selection != nil && selection.ReservedVIPPortID != test.wantPortID {
 				t.Errorf("VIP port = %q, want %q", selection.ReservedVIPPortID, test.wantPortID)
+			}
+			if selection != nil && selection.ReservedVIPSubnetID != test.wantSubnet {
+				t.Errorf("VIP subnet = %q, want %q", selection.ReservedVIPSubnetID, test.wantSubnet)
 			}
 		})
 	}

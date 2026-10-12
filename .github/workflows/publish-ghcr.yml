@@ -16,6 +16,18 @@ jobs:
       - name: Check out source
         uses: actions/checkout@v4
 
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Run tests
+        run: go test -count=1 ./...
+
+      - name: Run vet
+        run: go vet ./...
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 

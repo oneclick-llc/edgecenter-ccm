@@ -31,22 +31,23 @@ type LbaasV2 struct {
 // These options are derived from service annotations, cloud config and service spec,
 // and are then reused across LB creation/update phases.
 type ServiceOptions struct {
-	FlavorID             string
-	NetworkID            string
-	SubnetID             string
-	FloatingNetworkID    string
-	VIPPortID            string
-	Internal             bool
-	KeepClientIP         bool
-	UseProxyProtocol     bool
-	SecretID             string
-	Timeouts             *ListenerTimeoutConfig
-	LBMethod             edgecloud.LoadbalancerAlgorithm
-	SessionPersistence   *edgecloud.LoadbalancerSessionPersistence
-	CreateMonitor        bool
-	ManageSecurityGroups bool
-	LBClass              *LBClass
-	NodeSecurityGroupIDs []string
+	FlavorID              string
+	NetworkID             string
+	SubnetID              string
+	FloatingNetworkID     string
+	VIPPortID             string
+	SecurityGroupSubnetID string
+	Internal              bool
+	KeepClientIP          bool
+	UseProxyProtocol      bool
+	SecretID              string
+	Timeouts              *ListenerTimeoutConfig
+	LBMethod              edgecloud.LoadbalancerAlgorithm
+	SessionPersistence    *edgecloud.LoadbalancerSessionPersistence
+	CreateMonitor         bool
+	ManageSecurityGroups  bool
+	LBClass               *LBClass
+	NodeSecurityGroupIDs  []string
 }
 
 // EnsureLoadBalancer creates or updates the load balancer for the Service.
@@ -121,6 +122,7 @@ func (l *LbaasV2) ensureLoadBalancer(ctx context.Context, clusterName string, ap
 				return nil, err
 			}
 			opts.VIPPortID = staticIP.ReservedVIPPortID
+			opts.SecurityGroupSubnetID = staticIP.ReservedVIPSubnetID
 		}
 
 		klog.V(2).Infof("[LB][%s] Creating loadbalancer %s", serviceName, name)
@@ -138,6 +140,7 @@ func (l *LbaasV2) ensureLoadBalancer(ctx context.Context, clusterName string, ap
 				return nil, err
 			}
 			opts.VIPPortID = staticIP.ReservedVIPPortID
+			opts.SecurityGroupSubnetID = staticIP.ReservedVIPSubnetID
 		}
 		klog.V(2).Infof("[LB][%s] LoadBalancer %s already exists", serviceName, loadbalancer.Name)
 	}

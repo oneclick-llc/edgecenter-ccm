@@ -29,7 +29,7 @@ spec:
       serviceAccountName: ec-ccm
       containers:
         - name: edgecenter-cloud-controller-manager
-          image: ghcr.io/oneclick-llc/edgecenter-ccm:v2.2.1
+          image: ghcr.io/oneclick-llc/edgecenter-ccm:v2.2.2
           imagePullPolicy: IfNotPresent
           command:
             - ec-ccm
