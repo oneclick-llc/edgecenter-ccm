@@ -238,7 +238,7 @@ func init() {
 			klog.Infof("Error reading config: %v", err)
 		}
 
-		klog.Infof("Config after read %v", cfg)
+		LogCfg(cfg)
 		if err != nil {
 			return nil, err
 		}
@@ -263,8 +263,6 @@ func ReadConfig(config io.Reader) (Config, error) {
 		klog.Infof("Error reading config: %v", err)
 		return Config{}, err
 	}
-
-	klog.Infof("CONFIG %v", cfg.Edgecenter)
 
 	klog.V(5).Infof("Config, loaded from the config file:")
 	LogCfg(cfg)
