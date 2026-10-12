@@ -1,4 +1,4 @@
-VERSION=v2.2.4
+VERSION=v2.2.5
 ARCH=amd64
 GOOS=linux
 PLATFORM=linux/amd64
