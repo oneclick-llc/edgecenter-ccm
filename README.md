@@ -18,7 +18,7 @@ Currently `edgecenter-cloud-controller-manager` implements:
 | Kubernetes Version | Edgecenter Cloud Controller Manager Version | Validation |
 |--------------------|---------------------------------------------|------------|
 | v1.31              | v1.0.0                                      | Upstream compatibility entry |
-| v1.36              | v2.2.2                                      | Build and unit tests use Kubernetes v0.36.5 modules |
+| v1.36              | v2.2.3                                      | Build and unit tests use Kubernetes v0.36.5 modules |
 
 ## LoadBalancer Service Annotations
 
@@ -96,7 +96,7 @@ users:
       client-key-data: <client-key-data>
 ```
 
-The public container image is `ghcr.io/oneclick-llc/edgecenter-ccm:v2.2.2`.
+The public container image is `ghcr.io/oneclick-llc/edgecenter-ccm:v2.2.3`.
 
 ### Example cloud-config.yaml
 
