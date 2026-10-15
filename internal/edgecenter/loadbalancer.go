@@ -375,6 +375,16 @@ func (l *LbaasV2) resolveServiceOptions(ctx context.Context, svc *corev1.Service
 	}
 	opts.Timeouts = timeoutOverrides
 
+	if useProxyProtocol {
+		if svc.Annotations[ServiceAnnotationLoadBalancerDefaultTLSContainerRef] != "" {
+			return nil, fmt.Errorf("annotation %s cannot be used with TLS termination", ServiceAnnotationLoadBalancerProxyEnabled)
+		}
+		for _, port := range svc.Spec.Ports {
+			if port.Protocol != corev1.ProtocolTCP {
+				return nil, fmt.Errorf("annotation %s requires TCP ports", ServiceAnnotationLoadBalancerProxyEnabled)
+			}
+		}
+	}
 	secretID, err := l.getSecretID(ctx, svc)
 	if err != nil {
 		return nil, err

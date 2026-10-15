@@ -35,6 +35,7 @@ The following annotations can be used to customize LoadBalancer behavior.
 | `service.beta.kubernetes.io/edgecenter-internal-load-balancer` | Internal LB (no floating IP) | ✅ | ⚠️ Partial | Switching may not clean up existing floating IP |
 | `loadbalancer.edgecenter.com/default-tls-container-ref` | TLS secret ID for HTTPS termination | ✅ | ✅ | Updates listener or recreates it |
 | `loadbalancer.edgecenter.com/x-forwarded-for` | Enable X-Forwarded-For (HTTP mode) | ✅ | ♻️ Recreate | Triggers listener/pool recreation |
+| `loadbalancer.edgecenter.com/proxy-protocol` | Send the client IP through PROXY protocol | ✅ | Manual replacement | TCP only; configure the backend first, then replace existing pools |
 | `loadbalancer.edgecenter.com/timeout-client-data` | Listener client timeout | ✅ | ✅ | Updated in-place |
 | `loadbalancer.edgecenter.com/timeout-member-data` | Listener backend timeout | ✅ | ✅ | Updated in-place |
 | `loadbalancer.edgecenter.com/timeout-member-connect` | Listener connect timeout | ✅ | ✅ | Updated in-place |
@@ -58,6 +59,19 @@ The following annotations can be used to customize LoadBalancer behavior.
 - Network-related settings (`network-id`, VIP subnet) are **immutable after creation**.
 - Switching between internal and external LoadBalancers is **not fully reversible**.
 - Some annotations are defined but **not implemented yet**.
+
+### PROXY protocol
+
+Set `loadbalancer.edgecenter.com/proxy-protocol: "true"` to create a PROXY pool behind each TCP listener.
+The backend must accept PROXY protocol before you enable this annotation.
+PROXY protocol cannot use UDP, HTTP header insertion, or TLS termination on the load balancer.
+TLS can terminate on the backend.
+
+Existing pools have immutable protocols.
+If the requested protocol differs, the controller reports an error and keeps the active pool.
+During a maintenance window, replace each pool separately.
+The controller creates a replacement with the requested protocol and restores the node members.
+The load balancer, listeners, and reserved public IP stay in place.
 
 ---
 
