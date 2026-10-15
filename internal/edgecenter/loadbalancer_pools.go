@@ -46,9 +46,12 @@ func (l *LbaasV2) ensureLoadBalancerPools(ctx context.Context, lb *edgecloud.Loa
 		}
 
 		pool := poolsByListenerID[listener.ID]
+		createReq := l.buildPoolCreateRequest(listener, lb.Name, sp, svc, opts)
+		if pool != nil && pool.Protocol != createReq.Protocol {
+			// Pool protocols are immutable. Keep the active pool until the operator schedules its replacement.
+			return nil, nil, fmt.Errorf("pool %s uses protocol %s, requested %s; replace this pool during a maintenance window", pool.ID, pool.Protocol, createReq.Protocol)
+		}
 		if pool == nil {
-			createReq := l.buildPoolCreateRequest(listener, lb.Name, sp, svc, opts)
-
 			klog.V(4).Infof("Creating pool for key=%s listener=%s", key, listener.ID)
 			pool, err = l.createPool(ctx, createReq)
 			if err != nil {
@@ -81,6 +84,9 @@ func (l *LbaasV2) buildPoolCreateRequest(listener *edgecloud.Listener, lbName st
 	poolProto := edgecloud.LoadbalancerPoolProtocol(listener.Protocol)
 	if opts.KeepClientIP || opts.SecretID != "" {
 		poolProto = edgecloud.LoadbalancerPoolProtocol(edgecloud.ListenerProtocolHTTP)
+	}
+	if opts.UseProxyProtocol {
+		poolProto = edgecloud.LBPoolProtocolProxy
 	}
 
 	var healthMonitorOpts *edgecloud.HealthMonitorCreateRequest
