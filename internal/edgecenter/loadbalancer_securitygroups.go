@@ -2,7 +2,9 @@ package edgecenter
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"net/http"
 	"reflect"
 	"strings"
 
@@ -398,6 +400,10 @@ func createNodeSecurityGroupRules(ctx context.Context, client *edgecloud.Client,
 func applyNodeSecurityGroupIDForLB(ctx context.Context, client *edgecloud.Client, nodes []*corev1.Node, securityGroup string) error {
 	for _, node := range nodes {
 		instance, err := getInstanceByNode(ctx, client, node)
+		if isHTTPNotFound(err) {
+			klog.Warningf("skipping node %s for SG %s: no cloud instance in this region: %v", node.Name, securityGroup, err)
+			continue
+		}
 		if err != nil {
 			return err
 		}
@@ -501,6 +507,10 @@ func getNodeSecurityGroupID(ctx context.Context, client *edgecloud.Client, nodes
 		}
 
 		list, _, err := client.Instances.SecurityGroupList(ctx, instanceID)
+		if isHTTPNotFound(err) {
+			klog.Warningf("skipping node %s: no cloud instance %s in this region: %v", node.Name, instanceID, err)
+			continue
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -553,4 +563,9 @@ func getInstanceByNode(ctx context.Context, client *edgecloud.Client, node *core
 	}
 
 	return instance, nil
+}
+
+func isHTTPNotFound(err error) bool {
+	var respErr *edgecloud.ResponseError
+	return errors.As(err, &respErr) && respErr.Response != nil && respErr.Response.StatusCode == http.StatusNotFound
 }

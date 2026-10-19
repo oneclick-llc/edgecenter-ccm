@@ -148,22 +148,20 @@ func buildListenerCreateRequest(lbID string, lbName string, sp corev1.ServicePor
 	return req
 }
 
-// updateListenerIfNeeded updates mutable listener settings when the actual listener
-// does not match the desired configuration derived from the Service.
-func (l *LbaasV2) updateListenerIfNeeded(ctx context.Context, loadbalancerID string, listener *edgecloud.Listener, sp corev1.ServicePort, opts *ServiceOptions) error {
+func buildListenerUpdateRequest(listener *edgecloud.Listener, opts *ServiceOptions) (*edgecloud.ListenerUpdateRequest, bool) {
 	updateReq := &edgecloud.ListenerUpdateRequest{}
 	needsUpdate := false
 
 	if opts.Timeouts != nil {
-		if !intPtrEqual(listener.TimeoutClientData, opts.Timeouts.TimeoutClientData) {
+		if opts.Timeouts.TimeoutClientData != nil && !intPtrEqual(listener.TimeoutClientData, opts.Timeouts.TimeoutClientData) {
 			updateReq.TimeoutClientData = opts.Timeouts.TimeoutClientData
 			needsUpdate = true
 		}
-		if !intPtrEqual(listener.TimeoutMemberData, opts.Timeouts.TimeoutMemberData) {
+		if opts.Timeouts.TimeoutMemberData != nil && !intPtrEqual(listener.TimeoutMemberData, opts.Timeouts.TimeoutMemberData) {
 			updateReq.TimeoutMemberData = opts.Timeouts.TimeoutMemberData
 			needsUpdate = true
 		}
-		if !intPtrEqual(listener.TimeoutMemberConnect, opts.Timeouts.TimeoutMemberConnect) {
+		if opts.Timeouts.TimeoutMemberConnect != nil && !intPtrEqual(listener.TimeoutMemberConnect, opts.Timeouts.TimeoutMemberConnect) {
 			updateReq.TimeoutMemberConnect = opts.Timeouts.TimeoutMemberConnect
 			needsUpdate = true
 		}
@@ -174,6 +172,13 @@ func (l *LbaasV2) updateListenerIfNeeded(ctx context.Context, loadbalancerID str
 		needsUpdate = true
 	}
 
+	return updateReq, needsUpdate
+}
+
+// updateListenerIfNeeded updates mutable listener settings when the actual listener
+// does not match the desired configuration derived from the Service.
+func (l *LbaasV2) updateListenerIfNeeded(ctx context.Context, loadbalancerID string, listener *edgecloud.Listener, sp corev1.ServicePort, opts *ServiceOptions) error {
+	updateReq, needsUpdate := buildListenerUpdateRequest(listener, opts)
 	if !needsUpdate {
 		return nil
 	}
